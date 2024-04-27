@@ -2,6 +2,7 @@ plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
     id 'maven-publish'
+    id 'signing'
 }
 
 android {
@@ -28,6 +29,7 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
 }
 
 dependencies {
@@ -40,20 +42,110 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 }
 
-afterEvaluate {
-    publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                groupId = 'com.github.wwwlly'
-                artifactId = 'CommonLibrary'
-                version = '0.0.1'
+group = 'com.github.wwwlly'
+version = '0.0.1'
 
-                from components.debug // 或者 `from components.java` 对于 Java 库
+afterEvaluate {
+
+    publishing {
+        repositories {
+            mavenLocal()
+
+            maven {
+                url = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+//                url = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+//                url = layout.buildDirectory.dir('repo')
+                println("url: $url")
             }
         }
 
-        repositories {
-            mavenLocal()
+    }
+
+    if (project.getPlugins().hasPlugin('com.android.library')) {
+
+        task androidJavadocs(type: Javadoc) {
+            source = android.sourceSets.main.java.source
+            classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+            excludes = ['**/*.kt']
+        }
+
+        task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
+            classifier = 'javadoc'
+            from androidJavadocs.destinationDir
+        }
+
+        task androidSourcesJar(type: Jar) {
+            classifier = 'sources'
+            from android.sourceSets.main.java.source
         }
     }
+
+    if (JavaVersion.current().isJava9Compatible()) {
+        allprojects {
+            tasks.withType(Javadoc) {
+                options.addBooleanOption('html5', true)
+            }
+        }
+    }
+
+    artifacts {
+        if (project.getPlugins().hasPlugin('com.android.library')) {
+
+            archives androidSourcesJar
+            archives androidJavadocsJar
+        }
+    }
+
+    android.libraryVariants.all { variant ->
+
+        tasks.androidJavadocs.doFirst {
+            classpath += files(variant.javaCompileProvider.get().classpath.files.join(File.pathSeparator))
+        }
+    }
+
+    publishing.publications.all { publication ->
+        println("wwwwww3")
+        println("group: $group , version: $version")
+        publication.groupId = group
+        publication.version = version
+        artifactId = 'CommonLibrary'
+
+        publication.artifact androidSourcesJar
+        publication.artifact androidJavadocsJar
+
+
+        pom {
+            name = 'CommonLibrary'
+            description = 'common library'
+            url = 'https://github.com/wwwlly/CommonLibrary'
+
+            licenses {
+                license {
+                    name = 'The Apache License, Version 2.0'
+                    url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                }
+            }
+
+            developers {
+                developer {
+                    id = 'wwwlly'
+                    name = 'kemp'
+                    email = 'wangkp007@foxmail.com'
+                }
+            }
+
+            scm {
+                connection = 'scm:git:git://github.com/wwwlly/CommonLibrary.git'
+                developerConnection = 'scm:git:ssh://github.com:wwwlly/CommonLibrary.git'
+                url = 'https://github.com/wwwlly/CommonLibrary'
+            }
+        }
+    }
+
+    signing {
+        publishing.publications.all { publication ->
+            sign publication
+        }
+    }
+
 }
