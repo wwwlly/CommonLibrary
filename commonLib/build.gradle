@@ -3,14 +3,13 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
-apply from: '../gradle-mvn-push.gradle'
-
 android {
-    compileSdk 32
+    compileSdkVersion 32
+//    buildToolsVersion '32.0.2'
 
     defaultConfig {
-        minSdk 26
-        targetSdk 32
+        minSdkVersion 26
+        targetSdkVersion 32
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -42,114 +41,25 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 }
 
-//group = 'io.github.wwwlly'
-//version = '0.0.1'
-//
-//afterEvaluate {
-//
-//    publishing {
-//        repositories {
-//            mavenLocal()
-//
-//            maven {
-//                url = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
-////                url = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
-////                url = layout.buildDirectory.dir('repo')
-//                println("url: $url")
-//                credentials {
-//                    username = 'wangkp007@foxmail.com'
-//                    password = 'wkp.19890523'
-//                }
-//            }
-//        }
-//
-//    }
-//
-//    if (project.getPlugins().hasPlugin('com.android.library')) {
-//
-//        task androidJavadocs(type: Javadoc) {
-//            source = android.sourceSets.main.java.source
-//            classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-//            excludes = ['**/*.kt']
-//        }
-//
-//        task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
-//            classifier = 'javadoc'
-//            from androidJavadocs.destinationDir
-//        }
-//
-//        task androidSourcesJar(type: Jar) {
-//            classifier = 'sources'
-//            from android.sourceSets.main.java.source
-//        }
-//    }
-//
-//    if (JavaVersion.current().isJava9Compatible()) {
-//        allprojects {
-//            tasks.withType(Javadoc) {
-//                options.addBooleanOption('html5', true)
-//            }
-//        }
-//    }
-//
-//    artifacts {
-//        if (project.getPlugins().hasPlugin('com.android.library')) {
-//
-//            archives androidSourcesJar
-//            archives androidJavadocsJar
-//        }
-//    }
-//
-//    android.libraryVariants.all { variant ->
-//
-//        tasks.androidJavadocs.doFirst {
-//            classpath += files(variant.javaCompileProvider.get().classpath.files.join(File.pathSeparator))
-//        }
-//    }
-//
-//    publishing.publications.all { publication ->
-//        println("wwwwww3")
-//        println("group: $group , version: $version")
-//        publication.groupId = group
-//        publication.version = version
-//        artifactId = 'CommonLibrary'
-//
-//        publication.artifact androidSourcesJar
-//        publication.artifact androidJavadocsJar
-//
-//
-//        pom {
-//            name = 'CommonLibrary'
-//            description = 'common library'
-//            url = 'https://github.com/wwwlly/CommonLibrary'
-//
-//            licenses {
-//                license {
-//                    name = 'The Apache License, Version 2.0'
-//                    url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-//                }
-//            }
-//
-//            developers {
-//                developer {
-//                    id = 'wwwlly'
-//                    name = 'kemp'
-//                    email = 'wangkp007@foxmail.com'
-//                }
-//            }
-//
-//            scm {
-//                connection = 'scm:git:git://github.com/wwwlly/CommonLibrary.git'
-//                developerConnection = 'scm:git:ssh://github.com:wwwlly/CommonLibrary.git'
-//                url = 'https://github.com/wwwlly/CommonLibrary'
-//            }
-//        }
-//    }
-//
-//    signing {
-//        publishing.publications.all { publication ->
-//            sign publication
-//        }
-//    }
-//
-//}
+
+def group = 'com.github.wwwlly'
+def version = '0.0.3'
+def artifactId = 'CommonLibrary'
+
+apply plugin: 'maven'
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: 'https://packages.aliyun.com/663d838a61358333237e40ca/maven/repo-vmlca') {
+                authentication(
+                        userName: '6361ef237b63b44dd783e121',
+                        password: '4(L0LTR6Sfn='
+                )
+            }
+            pom.version = version
+            pom.artifactId = artifactId
+            pom.groupId = group
+        }
+    }
+}

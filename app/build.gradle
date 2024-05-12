@@ -42,5 +42,5 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
 //    implementation project(':commonLib')
-    implementation 'com.github.wwwlly:CommonLibrary:0.0.1'
+    implementation 'com.github.wwwlly:CommonLibrary:0.0.3'
 }
