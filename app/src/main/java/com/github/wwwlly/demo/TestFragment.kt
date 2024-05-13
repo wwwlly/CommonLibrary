@@ -19,6 +19,6 @@ class TestFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_test, null, false)
+        return inflater.inflate(R.layout.fragment_test, container, false)
     }
 }
