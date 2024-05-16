@@ -1,2 +1,3 @@
-include ':app'
+include ':demo-build'
 include ':commonLib'
+project(':demo-build').projectDir = new File('app')
